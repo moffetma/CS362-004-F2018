@@ -1,0 +1,15 @@
+--------- Testing Card: village ---------
+Player 1 hand count before playing Great Hall = 5, expected = 5
+Played cards before playing Great Hall = 0 
+--------- Playing Village card ---------
+Played cards after: 0 , expected = 1 
+---Test failed! Wrong # of cards in played pile!---
+Player 1 hand count = 5, expected = 5
+Player 1 actions count = 3, expected = 3
+---Test passed!---
+--------- village Testing Complete ---------
+
+File 'cardtest3.c'
+Lines executed:87.50% of 24
+cardtest3.c:creating 'cardtest3.c.gcov'
+

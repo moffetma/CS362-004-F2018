@@ -1,0 +1,111 @@
+        -:    0:Source:cardtest2.c
+        -:    0:Graph:cardtest2.gcno
+        -:    0:Data:cardtest2.gcda
+        -:    0:Runs:1
+        -:    0:Programs:1
+        -:    1:/*
+        -:    2:Max Moffett 
+        -:    3:Cardtest2.c - adventurer
+        -:    4:*/
+        -:    5:
+        -:    6:
+        -:    7:#include "dominion.h"
+        -:    8:#include "dominion_helpers.h"
+        -:    9:#include <string.h>
+        -:   10:#include <stdio.h>
+        -:   11:#include <assert.h>
+        -:   12:#include "rngs.h"
+        -:   13:#include <stdlib.h>
+        -:   14:
+        -:   15:#define TESTCARD "adventurer"
+        -:   16:
+        -:   17:int main() {
+        -:   18:
+        1:   19:    int handpos = 0, choice1 = 0, choice2 = 0, choice3 = 0, bonus = 0;
+        1:   20:    int seed = 900;
+        1:   21:    int numPlayers = 2;
+        1:   22:    int thisPlayer = 0;
+        -:   23:	struct gameState G, testG;
+        1:   24:	int k[10] = {adventurer, embargo, village, minion, mine, cutpurse,
+        -:   25:			sea_hag, tribute, smithy, council_room};
+        -:   26:
+        -:   27:	// initialize a game state and player cards
+        1:   28:	initializeGame(numPlayers, k, seed, &G);
+        -:   29:
+        1:   30:	printf("----------------- Testing Card: %s ----------------\n", TESTCARD);
+        -:   31:
+        -:   32:	// copy the game state to a test case
+        1:   33:	memcpy(&testG, &G, sizeof(struct gameState));
+        -:   34:
+        1:   35:	choice1 = 1;
+        1:   36:    printf("Player 1 discard count before: %d\n", testG.discardCount[thisPlayer]);
+        -:   37:    
+        1:   38:    printf("Player 1 hand:\n");
+        -:   39:    int p;
+       12:   40:    for (p = 0; p < numHandCards(&G); p++)
+        -:   41:    {	
+        5:   42:    	printf("card %d: %d", p , testG.hand[thisPlayer][p]);
+        5:   43:    	printf(" cost %d \n", getCost(testG.hand[thisPlayer][p]));
+        5:   44:    	handpos++;
+        5:   45:    }
+        1:   46:    handpos=0;
+        -:   47:
+        1:   48:    printf("player 1 deck count = %d \n", testG.deckCount[0]);
+        1:   49:	printf("player 2 deck count = %d \n", testG.deckCount[1]);
+        1:   50:	printf("played cards before: %d \n", testG.playedCardCount);
+        1:   51:    printf("Player 1 discard count before: %d\n", testG.discardCount[thisPlayer]);
+        -:   52:
+        1:   53:	printf("---------Playing %s card ---------\n", TESTCARD);
+        1:   54:	cardEffect(adventurer, choice1, choice2, choice3, &testG, handpos, &bonus);
+        -:   55:
+        1:   56:	printf("Player 1 discard count after: %d\n", testG.discardCount[thisPlayer]);
+        1:   57:	if(testG.discardCount[thisPlayer] >3)
+    #####:   58:		{printf("---Test failed! Discarded too many cards from starting deck----\n");}
+        1:   59:	else printf("---Test passed!---\n");
+        -:   60:
+        -:   61:	//modified check for discard pile, we should have some discards, if we have less than 0 or 0 something is wrong 
+        1:   62:	printf("Comparing discard count \n");
+        2:   63:	if(testG.discardCount[thisPlayer] < G.discardCount[thisPlayer] || testG.discardCount[thisPlayer] == G.discardCount[thisPlayer])
+        1:   64:		{printf("---Test failed! Player 1's discard count is incorrect!----\n");}
+    #####:   65:	else printf("---Test passed!---\n");
+        -:   66:
+        -:   67:
+        1:   68:	printf("played cards after: %d \n", testG.playedCardCount);
+        -:   69:
+        1:   70:	printf("Player 1 hand:\n");
+        -:   71:	int q;
+       12:   72:	 for (q = 0; q < numHandCards(&testG); q++)
+        -:   73:    {	
+        5:   74:    	printf("card %d: %d ", q, handCard(handpos, &testG));
+        5:   75:    	printf(" cost %d \n", getCost(testG.hand[thisPlayer][q]));
+        5:   76:    	handpos++;
+        5:   77:    }
+        -:   78:	
+        1:   79:	printf("coins = %d, expected = %d\n", testG.coins, G.coins);
+        1:   80:	if (testG.coins != G.coins)
+    #####:   81:		{printf("---Test failed! Coin count modified!\n");}
+        1:   82:	else printf("---Test passed!---\n");
+        -:   83:
+        1:   84:	printf("player 1 hand %d \n", testG.handCount[0]);
+        1:   85:	printf("player 2 hand %d \n", testG.handCount[1]);
+        1:   86:	printf("player 1 deck %d \n", testG.deckCount[0]);
+        1:   87:	printf("player 2 deck %d \n", testG.deckCount[1]);
+        -:   88:	
+        1:   89:	if (testG.handCount[0]+testG.deckCount[0]+testG.discardCount[thisPlayer] != 10)
+    #####:   90:	{printf("---Test failed! Player 1's hand, deck, and disard have incorrect total!\n");}
+        1:   91:	else printf("---Test passed!---\n");
+        -:   92:
+        1:   93:	printf("estate count= %d,  expected = %d \n", testG.supplyCount[estate], G.supplyCount[estate]);
+        1:   94:	printf("duchy count= %d ,  expected = %d \n", testG.supplyCount[duchy], G.supplyCount[duchy]);
+        1:   95:	printf("province count= %d,  expected = %d \n", testG.supplyCount[province], G.supplyCount[province]);
+        -:   96:
+        3:   97:	if(testG.supplyCount[estate] != G.supplyCount[estate] || testG.supplyCount[duchy] != G.supplyCount[duchy] || testG.supplyCount[province] != G.supplyCount[province])
+    #####:   98:		{printf("---Test failed, estate cards modified!---\n");}
+        -:   99:	else 
+        1:  100:		printf("---Test passed!---\n");
+        -:  101:	
+        1:  102:	printf("\n--------- %s Testing Complete ---------\n\n", TESTCARD);
+        -:  103:
+        -:  104:
+        1:  105:	return 0;
+        -:  106:}

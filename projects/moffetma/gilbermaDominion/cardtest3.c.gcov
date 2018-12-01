@@ -1,0 +1,62 @@
+        -:    0:Source:cardtest3.c
+        -:    0:Graph:cardtest3.gcno
+        -:    0:Data:cardtest3.gcda
+        -:    0:Runs:1
+        -:    0:Programs:1
+        -:    1:/*
+        -:    2:Max Moffett 
+        -:    3:Cardtest3.c - Village - updated for Assignment 5 
+        -:    4:*/
+        -:    5:
+        -:    6:#include "dominion.h"
+        -:    7:#include "dominion_helpers.h"
+        -:    8:#include <string.h>
+        -:    9:#include <stdio.h>
+        -:   10:#include <assert.h>
+        -:   11:#include "rngs.h"
+        -:   12:#include <stdlib.h>
+        -:   13:
+        -:   14:#define TESTCARD "village"
+        -:   15://village test 
+        -:   16:int main()
+        -:   17:{
+        -:   18:	
+        1:   19:	int seed = 20;
+        1:   20:	int numPlayers = 2;
+        1:   21:	int choice1 = 0, choice2 = 0, choice3 = 0, handpos = 0, bonus = 0;
+        -:   22:	struct gameState G, testG;
+        1:   23:	int k[10] = {adventurer, embargo, village, minion, mine, cutpurse,
+        -:   24:			sea_hag, tribute, smithy, council_room};
+        -:   25:	
+        -:   26:	//printf("first test:%d, testG.handCount[testG.whoseTurn])
+        1:   27:	printf("--------- Testing Card: %s ---------\n", TESTCARD);
+        -:   28:	
+        1:   29:	initializeGame(numPlayers, k, seed, &G);
+        1:   30:	memcpy(&testG, &G, sizeof(struct gameState));
+        -:   31:
+        1:   32:	printf("Player 1 hand count before playing Great Hall = %d, expected = %d\n", testG.handCount[testG.whoseTurn], G.handCount[G.whoseTurn]);
+        -:   33:
+        1:   34:	printf("Played cards before playing Great Hall = %d \n", testG.playedCardCount);
+        -:   35:	
+        1:   36:	printf("--------- Playing Village card ---------\n"); 
+        -:   37:
+        1:   38:	cardEffect(village, choice1, choice2, choice3, &testG, handpos, &bonus);
+        -:   39:
+        1:   40:	printf("Played cards after: %d , expected = %d \n", testG.playedCardCount, (G.playedCardCount +1));
+        1:   41:	if (testG.playedCardCount != G.playedCardCount+1)
+        1:   42:		{printf("---Test failed! Wrong # of cards in played pile!---\n");}
+    #####:   43:	else printf("---Test passed!---\n"); 
+        -:   44:
+        1:   45:	printf("Player 1 hand count = %d, expected = %d\n", testG.handCount[testG.whoseTurn],  G.handCount[G.whoseTurn]);
+        1:   46:	if (testG.handCount[testG.whoseTurn] != G.handCount[G.whoseTurn])
+    #####:   47:		{printf("---Test failed! Player 1's hand count modified!");}
+        -:   48:
+        1:   49:	printf("Player 1 actions count = %d, expected = %d\n", testG.numActions, G.numActions + 2);
+        1:   50:	if (testG.numActions != G.numActions + 2)
+    #####:   51:	{printf("---Test failed! Incorrect # of actions!---\n");}
+        1:   52:	else printf("---Test passed!---\n");
+        -:   53:
+        1:   54:	printf("--------- %s Testing Complete ---------\n\n", TESTCARD);
+        -:   55:	
+        1:   56:	return 0;
+        -:   57:}

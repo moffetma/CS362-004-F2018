@@ -1,0 +1,18 @@
+--------- Testing Card: outpost ---------
+Player 1 hand count before playing Outpost = 5, expected = 5
+Played cards before playing Outpost = 0 
+Outpost played count before playing Outpost = 0 
+--------- Playing Outpost card ---------
+Played cards after: 1 , expected = 1 
+---Test passed!---
+Player 1 hand count = 4, expected = 4
+Player 2 hand count =0, expected = 0 
+Test passed!
+Game state Outpost played count = -1, expected = 1
+---Test failed! Incorrect Outpost counter!---
+--------- outpost Testing Complete ---------
+
+File 'cardtest4.c'
+Lines executed:86.21% of 29
+cardtest4.c:creating 'cardtest4.c.gcov'
+

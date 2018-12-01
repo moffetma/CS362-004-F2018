@@ -1,0 +1,29 @@
+----------------- Testing Card: smithy ----------------
+player 1 deck count before Smithy played: 5 
+player 1 hand count before Smithy played: 5 
+player 2 deck count before Smithy played: 10 
+played card count before Smithy played: 0 
+--------- Playing Smithy card ---------
+played cards count after smithy played: 1 
+Test passed!
+Player 1 hand count = 8, expected = 7
+Test failed, incorrect # of cards in hand!
+Player 1 deck count = 1, expected = 2
+Test failed, incorrect deck count!
+Total coins = 5, expected = 5
+Test passed!
+Player 2 hand count =0, expected = 0 
+Test passed!
+Player 2 deck count =10 , expected = 10
+Test passed!
+estate count= 8,  expected = 8 
+duchy count= 8 ,  expected = 8 
+province count= 8,  expected = 8 
+Test passed!
+
+ --------- smithy Testing Complete ---------
+
+File 'cardtest1.c'
+Lines executed:86.27% of 51
+cardtest1.c:creating 'cardtest1.c.gcov'
+

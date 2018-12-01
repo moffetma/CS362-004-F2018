@@ -1,0 +1,179 @@
+        -:    0:Source:randomtestcard2.c
+        -:    0:Graph:randomtestcard2.gcno
+        -:    0:Data:randomtestcard2.gcda
+        -:    0:Runs:1
+        -:    0:Programs:1
+        -:    1:/*
+        -:    2:Max Moffett 
+        -:    3:randomtestcard2- Outpost
+        -:    4:*/
+        -:    5:
+        -:    6:#include "dominion.h"
+        -:    7:#include "dominion_helpers.h"
+        -:    8:#include <string.h>
+        -:    9:#include <stdio.h>
+        -:   10:#include <assert.h>
+        -:   11:#include "rngs.h"
+        -:   12:#include <stdlib.h>
+        -:   13:#include <math.h>
+        -:   14:#include <time.h>
+        -:   15:#define TESTCARD "outpost"
+        -:   16:
+        -:   17:
+        -:   18:int main()
+        -:   19:{
+        -:   20:	//set up random seeds 
+        -:   21:	time_t t; 
+        1:   22:	srand((unsigned) time(&t));
+        -:   23:
+        -:   24:	int i, n, p; 
+        -:   25:	//create original game state 
+        -:   26:	struct gameState G; 
+        -:   27:	//variables needed for cardEffect all set to 0 
+        1:   28:	int choice1=0, choice2=0, choice3=0, handpos=0, bonus=0; 
+        -:   29:	 
+        -:   30:	//seeds for Random() function 
+        1:   31:	SelectStream(2);
+        1:   32:	PutSeed(3);
+        -:   33:
+        -:   34:	//flags for our test loops, set initial success flag to 1, any failures will change it 
+        1:   35:	int successCount=0; 
+        -:   36:	//int successFlag=1; 
+        -:   37:
+        -:   38:	//test loop for 1000 hands 
+        1:   39:	printf("------Testing Outpost for 1000 hands------\n");
+     2002:   40:	for (n=0; n<1000;n++)
+     1000:   41:	{	int successFlag=1; 
+        -:   42:		//set up test gamestate 
+        -:   43:		struct gameState testG; 
+        -:   44:		//randomize number of players 
+     1000:   45:		int numPlayers=  (rand() % (4 + 1 - 2) + 2);
+        -:   46:		//fill our original gamestate struct with random bytes (from lecture)
+ 52602000:   47:		for (i=0;i<sizeof(struct gameState);i++){
+ 26300000:   48:			((char*)&G)[i] = floor(Random()*256);
+ 26300000:   49:			}
+        -:   50:		//pick a random player 
+     1000:   51:		p = floor(Random()* MAX_PLAYERS);
+        -:   52:		//if random player p is greater than our # of players, set the # of players to p+1 
+     1000:   53:		if (p > numPlayers)
+        -:   54:		{
+       87:   55:			numPlayers = p+1; 
+       87:   56:		}
+        -:   57:		//set the number of players for our gamestate 
+     1000:   58:		G.numPlayers = numPlayers;
+        -:   59:		
+        -:   60:		//fill player deck, discard, and hand count with sane random values 
+        -:   61:		int k; 
+     8350:   62:		for (k=0;k<numPlayers;k++)
+        -:   63:		{
+     3175:   64:		G.deckCount[k] = floor(Random() * MAX_DECK);
+     3175:   65:		G.discardCount[k] = floor(Random() * MAX_DECK);
+     3175:   66:		G.handCount[k] = floor(Random() * MAX_HAND); 
+     3175:   67:		}	
+        -:   68:		//randomize played card couunt for the game state 
+     1000:   69:		G.playedCardCount= floor(Random() * MAX_DECK);
+        -:   70:		
+        -:   71:		//fill current player deck, discard, and hand counts with sane random values 
+     1000:   72:		G.deckCount[p] = floor(Random() * MAX_DECK);
+     1000:   73:		G.discardCount[p] = floor(Random() * MAX_DECK);
+     1000:   74:		G.handCount[p] = floor(Random() * MAX_HAND);
+        -:   75:		
+        -:   76:		//set turn to our randomized current player 
+     1000:   77:		G.whoseTurn = p;
+        -:   78:		//set other game state attributes to known values for comparison later 
+     1000:   79:		G.numActions =0; 
+     1000:   80:		G.numBuys = 1; 
+     1000:   81:		G.outpostPlayed=0; 
+        -:   82:
+        -:   83:		//randomize values for estate cards, using a balance of values for a 2 to 4 player game
+     1000:   84:		G.supplyCount[estate]=floor(Random()*10);
+     1000:   85:		G.supplyCount[duchy]=floor(Random()*10);
+     1000:   86:		G.supplyCount[province]=floor(Random()*10);
+        -:   87:
+        -:   88:		//randomize values for treasure cards based on standard treasure maxes for a normal game 
+     1000:   89:		G.supplyCount[copper]=floor(Random()*60);
+     1000:   90:		G.supplyCount[silver]=floor(Random()*40);
+     1000:   91:		G.supplyCount[gold]=floor(Random()*30);
+        -:   92:
+        -:   93:		//Display stats for this hand 
+     1000:   94:		printf("------Hand %d ------\n",n+1);
+     1000:   95:		printf("Number of players this hand: %d\n", numPlayers);
+     1000:   96:		printf("Player %d's turn to play Outpost\n", p);
+        -:   97:
+        -:   98:		//copy gamestate G to test state testG for comparison after calling our card function 
+     1000:   99:		memcpy(&testG, &G, sizeof(struct gameState));
+        -:  100:
+        -:  101:		//get result of cardEffect as an int to check it for some internal issue and call the card function 
+     1000:  102:		int checkFunction = cardEffect(outpost, choice1, choice2, choice3, &G, handpos, &bonus);
+        -:  103:		
+        -:  104:		//assert that it returned 0 so there was no internal problem 
+     2000:  105:		assert(checkFunction == 0); 
+        -:  106:
+        -:  107:		//check that the number of Actions was not affected 
+     1000:  108:		printf("-----Checking Actions------\n");
+     1000:  109:		if (G.numActions != testG.numActions)
+    #####:  110:			{printf("Test failed, incorrect # of actions!\n"); successFlag=0;}
+     1000:  111:		else {printf("Test passed!\n");}
+        -:  112:		// check that the number of Buys was not affected 
+        -:  113:		//if it was, display error and set successflag to 0 
+     1000:  114:		printf("-----Checking Number of Buys------\n");
+        -:  115:		// assert(G.numBuys == testG.numBuys);
+     1000:  116:		if (G.numBuys != testG.numBuys)
+    #####:  117:			{printf("Test failed, incorrect # of buys! Expected: %d Actual: %d\n", testG.numBuys, G.numBuys); successFlag=0;}
+     1000:  118:		else {printf("Test passed!\n");}
+        -:  119:		//check that the Outpost Played status was not changed 
+     1000:  120:		printf("-----Checking Outpost Played Status------\n");
+     1000:  121:		if (G.outpostPlayed != testG.outpostPlayed+1)
+     1000:  122:			{printf("Test failed, incorrect Outpost status!\n"); successFlag=0;}
+    #####:  123:		else {printf("Test passed!\n");}
+        -:  124:
+        -:  125:		//check that number of played cards was increased by 1 as outpost calls discardCard 
+     1000:  126:		printf("-----Checking Played Card Count------\n");
+     1000:  127:		if (G.playedCardCount != testG.playedCardCount+1)
+    #####:  128:			{printf("Test failed, incorrected played card count! Actual: %d expected: %d \n", G.playedCardCount, testG.playedCardCount+1); successFlag=0;}
+     1000:  129:		else {printf("Test passed!\n");}
+        -:  130:		
+        -:  131:		//loop through player discards and verify they were not affected 
+     1000:  132:		printf("------Checking Discard Counts------\n");
+        -:  133:		int y;
+     8350:  134:		for (y=0;y<numPlayers;y++)
+        -:  135:		{
+     3175:  136:			if(G.discardCount[y] != testG.discardCount[y])
+    #####:  137:				{printf("Test failed, player %d's discard count changed!\n", y);}
+     3175:  138:			else {printf("Test passed for player %d\n", y);} 
+        -:  139:
+     3175:  140:		}
+        -:  141:
+     1000:  142:		printf("------Checking Player Hand Count------\n");
+        -:  143:		
+     1000:  144:			if(G.handCount[p] != testG.handCount[p]-1)
+        -:  145:			{
+    #####:  146:				printf("Test failed, player %d's hand count changed! Expected: %d Actual: %d \n",p, testG.handCount[p],G.handCount[p]);
+    #####:  147:				successFlag=0;
+    #####:  148:			}
+     1000:  149:			else {printf("Test passed for player %d\n", p);}
+        -:  150:
+        -:  151:		//verify that coin counts were not affected 
+     1000:  152:		printf("------Checking Coin Counts------\n");
+     3000:  153:		if(testG.supplyCount[copper] != G.supplyCount[copper] || testG.supplyCount[silver] != G.supplyCount[silver] || testG.supplyCount[gold] != G.supplyCount[gold])
+    #####:  154:			{printf("---Test failed, coin counts modified!---\n"); successFlag=0;}
+     1000:  155:		else printf("Test passed!\n"); 
+        -:  156:
+        -:  157:		//verify that the # of estate cards was not affected 
+     1000:  158:		printf("------Checking Estate Card Counts------\n");
+     3000:  159:		if(testG.supplyCount[estate] != G.supplyCount[estate] || testG.supplyCount[duchy] != G.supplyCount[duchy] || testG.supplyCount[province] != G.supplyCount[province])
+    #####:  160:			{printf("---Test failed, estate cards modified!---\n");}
+        -:  161:		else 
+     1000:  162:			printf("Test passed!\n");
+        -:  163:
+        -:  164:		//if all tests were successful (no failed test changed the flag to 0), increment success count 
+     1000:  165:		if(successFlag == 1)
+    #####:  166:			{successCount++;}
+        -:  167:		//display successful tests out of total tests n+1 loop counter 
+     1000:  168:		printf("Successful test count: %d out of %d\n\n", successCount, n+1); 
+        -:  169:		
+     1000:  170:	}
+        -:  171:
+        1:  172:return 0;
+        -:  173:
+        -:  174:}
